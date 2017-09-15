@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,8 @@ public class GroupCreation extends AppCompatActivity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
+    private RadioGroup g1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +63,7 @@ public class GroupCreation extends AppCompatActivity {
         sv.removeAllViews();
         Snackbar.make(findViewById(R.id.R1),"View Refreshed",Snackbar.LENGTH_SHORT).show();
             int size=wifiList.size();
-        RadioGroup g1=new RadioGroup(this);
+         g1=new RadioGroup(this);
         sv.addView(g1);
         if(g1!=null) {
             for (int i = 0; i < size; i++) {
@@ -73,7 +76,26 @@ public class GroupCreation extends AppCompatActivity {
             Toast.makeText(this, "G1:NULL", Toast.LENGTH_SHORT).show();
     }
     void invite(View view){
-    Snackbar.make(findViewById(R.id.R1),"Invites Sent",Snackbar.LENGTH_SHORT).show();
+        int radioButtonID = g1.getCheckedRadioButtonId();
+        RadioButton radioButton =(RadioButton) g1.findViewById(radioButtonID);
+       String info= radioButton.getText().toString();
+        String[] x=info.split("\n");
+        String SSID=x[1];
+        Toast.makeText(this,SSID, Toast.LENGTH_SHORT).show();
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + SSID + "\"";
+        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        wMan.addNetwork(conf);
+        List<WifiConfiguration> list = wMan.getConfiguredNetworks();
+        for( WifiConfiguration i : list ) {
+            if(i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
+                wMan.disconnect();
+                wMan.enableNetwork(i.networkId, true);
+                wMan.reconnect();
+                break;
+            }
+        }
+        while(wMan.getConnectionInfo().getSSID()!=SSID);
 
     }
     void ref(View view){
