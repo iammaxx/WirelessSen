@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">WirelessSen</string>
+    <string name="title_activity_group_creation">GroupCreation</string>
+</resources>
