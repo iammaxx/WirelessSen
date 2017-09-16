@@ -1,5 +1,6 @@
 package com.wirelesssen;
 
+import android.app.ProgressDialog;
 import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class GroupCreation extends AppCompatActivity {
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
     private RadioGroup g1;
+    private TextView dname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +78,7 @@ public class GroupCreation extends AppCompatActivity {
         else
             Toast.makeText(this, "G1:NULL", Toast.LENGTH_SHORT).show();
     }
-    void invite(View view){
+    void invite(View view) throws InterruptedException {
         int radioButtonID = g1.getCheckedRadioButtonId();
         RadioButton radioButton =(RadioButton) g1.findViewById(radioButtonID);
        String info= radioButton.getText().toString();
@@ -87,6 +90,7 @@ public class GroupCreation extends AppCompatActivity {
         conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
         wMan.addNetwork(conf);
         List<WifiConfiguration> list = wMan.getConfiguredNetworks();
+        if(!wMan.getConnectionInfo().getSSID().equals("\""+SSID+"\""))
         for( WifiConfiguration i : list ) {
             if(i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
                 wMan.disconnect();
@@ -95,7 +99,19 @@ public class GroupCreation extends AppCompatActivity {
                 break;
             }
         }
-        while(wMan.getConnectionInfo().getSSID()!=SSID);
+//       String[] y= wMan.getConnectionInfo().getSSID().split("\"");
+//
+//        while(true) {
+//            if(y.length>1)
+//            if ((y[1].equals(SSID)))
+//            break;
+//                Thread.sleep(10);
+//                y = wMan.getConnectionInfo().getSSID().split("\"");
+//        }
+        dname=(TextView)findViewById(R.id.dname);
+       String invite="JOIN-GROUP_"+dname.getText().toString()+"_";
+        UdpClientThread send=new UdpClientThread(invite.getBytes(),"192.168.43.1",4445);
+        send.start();
 
     }
     void ref(View view){

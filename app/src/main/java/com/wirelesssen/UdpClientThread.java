@@ -2,6 +2,7 @@ package com.wirelesssen;
 
 import android.os.Message;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -14,9 +15,6 @@ public class UdpClientThread extends Thread{
 
     String dstAddress;
     int dstPort;
-    private boolean running;
-
-
     DatagramSocket socket;
     InetAddress address;
     byte[] message;
@@ -27,12 +25,6 @@ public class UdpClientThread extends Thread{
         dstPort = port;
         this.message=message;
     }
-
-    public void setRunning(boolean running){
-        this.running = running;
-    }
-
-
     @Override
     public void run() {
 
@@ -42,6 +34,7 @@ public class UdpClientThread extends Thread{
             DatagramPacket packet =
                     new DatagramPacket(message,message.length, address, dstPort);
             socket.send(packet);
+            Log.d("Invite","Sent");
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {

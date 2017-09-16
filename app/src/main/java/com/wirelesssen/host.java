@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -84,6 +86,10 @@ public class host extends AppCompatActivity {
         {
             wMan.setWifiEnabled(true);
         }
+        p1.dismiss();
+        myhandler hand=new myhandler(this);
+        UdpServerThread receive=new UdpServerThread(4445,hand);
+        receive.start();
     }
 
     public void dis(View view) {
@@ -144,5 +150,35 @@ public class host extends AppCompatActivity {
             return "IP:"+ip + "  MAC:" + mac;
         }
     }
+private void deliver(String Message)
+{
+   textResult.setText(Message);
+}
+    public static class myhandler extends Handler {
+        private host parent;
+
+        public myhandler(host parent) {
+            super();
+            this.parent = parent;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+
+          String[] ob=(String[]) msg.obj;
+            String invite=ob[0];
+            String dname;
+            String address;
+            String IP=ob[1];
+            String[] x=invite.split("_");
+            if(x[0].equals("JOIN-GROUP")){
+                dname=x[1];
+                address=IP;
+                //Toast.makeText(parent, "Invite from "+dname+"\nIP:"+address, Toast.LENGTH_SHORT).show();
+                parent.deliver( "Invite from "+dname+"\nIP:"+address);
+            }
+        }
+    }
+
 }
 

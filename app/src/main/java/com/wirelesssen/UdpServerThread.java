@@ -1,5 +1,7 @@
 package com.wirelesssen;
 
+import android.app.Notification;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Date;
+import java.util.logging.Handler;
 
 import static android.content.ContentValues.TAG;
 
@@ -19,18 +22,20 @@ import static android.content.ContentValues.TAG;
 public class UdpServerThread extends Thread{
     int serverPort;
     DatagramSocket socket;
-
+    host.myhandler handler;
     boolean running;
-    public UdpServerThread(int serverPort) {
+    public UdpServerThread(int serverPort, host.myhandler handler) {
         super();
         this.serverPort = serverPort;
+        this.handler=handler;
     }
     @Override
     public void run() {
 
         running = true;
-
+        while(true){
         try {
+
             socket = new DatagramSocket(serverPort);
             Log.e(TAG, "UDP Server is running");
 
@@ -40,12 +45,14 @@ public class UdpServerThread extends Thread{
                 socket.receive(packet);     //this code block the program flow
                 InetAddress address = packet.getAddress();
                 int port = packet.getPort();
-                String dString = new Date().toString() + "\n"
-                        + "Your address " + address.toString() + ":" + String.valueOf(port);
-                buf = dString.getBytes();
-                packet = new DatagramPacket(buf, buf.length, address, port);
-                socket.send(packet);
-
+                String[] ob=new String[10];
+                ob[0]=   new String(packet.getData());
+                Log.e(TAG,"Packet Received:"+ob[0]);
+                ob[1]=address.toString();
+                Message m=new Message();
+                m.what=1;
+                m.obj=ob;
+                handler.sendMessage(Message.obtain(handler,1,ob));
             }
             Log.e(TAG, "UDP Server ended");
         } catch (SocketException e) {
@@ -58,5 +65,5 @@ public class UdpServerThread extends Thread{
                 Log.e(TAG, "socket.close()");
             }
         }
-    }
+    }}
 }

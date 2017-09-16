@@ -16,7 +16,7 @@
         android:layout_height="77dp">
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/dname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Device Name"
