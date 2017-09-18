@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -27,6 +29,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,20 +102,42 @@ public class GroupCreation extends AppCompatActivity {
                 break;
             }
         }
-//       String[] y= wMan.getConnectionInfo().getSSID().split("\"");
-//
-//        while(true) {
-//            if(y.length>1)
-//            if ((y[1].equals(SSID)))
-//            break;
-//                Thread.sleep(10);
-//                y = wMan.getConnectionInfo().getSSID().split("\"");
-//        }
-        dname=(TextView)findViewById(R.id.dname);
-       String invite="JOIN-GROUP_"+dname.getText().toString()+"_";
-        UdpClientThread send=new UdpClientThread(invite.getBytes(),"192.168.43.1",4445);
-        send.start();
+        final ProgressDialog p = new ProgressDialog(this);
+        p.setMessage("Sending Invite ...");
+        p.show();
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    //check if connected!
+                    while (!isConnected(GroupCreation.this)) {
+                        //Wait to connect
+                        Thread.sleep(1000);
+                    }
+                    p.dismiss();
+                    dname = (TextView) findViewById(R.id.dname);
+                    String invite = "JOIN-GROUP_" + dname.getText().toString() + "_";
+                    UdpClientThread send = new UdpClientThread(invite.getBytes(), "192.168.43.1", 4445);
+                    send.start();
 
+                } catch (Exception e) {
+                }
+            }
+        };
+        t.start();
+        myhandler handler = new myhandler(this);
+        Inviteresponse i = new Inviteresponse(4445,handler);
+        i.start();
+    }
+    public static boolean isConnected(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        }
+
+        return networkInfo != null && networkInfo.getState() == NetworkInfo.State.CONNECTED;
     }
     void ref(View view){
         wMan.startScan();
@@ -142,6 +167,29 @@ public class GroupCreation extends AppCompatActivity {
         }
     }
 
+    public static class myhandler extends Handler {
+        private GroupCreation parent;
+
+        public myhandler(GroupCreation parent) {
+            super();
+            this.parent=parent;
+
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            DatagramPacket packet= (DatagramPacket) msg.obj;
+            String invite=new String(packet.getData());
+            String address=packet.getAddress().toString();
+            String x[]=invite.split("_");
+            if(x[1].equals("ACCEPT"))
+                Toast.makeText(parent, "Invitation Accepted !", Toast.LENGTH_SHORT).show();
+                else if(x[1].equals("REJECT"))
+                Toast.makeText(parent, "Invitation Rejected !", Toast.LENGTH_SHORT).show();
+                else
+                Toast.makeText(parent, "Unknown Response", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
 }

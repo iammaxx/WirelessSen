@@ -12,13 +12,11 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class UdpClientThread extends Thread{
-
     String dstAddress;
     int dstPort;
     DatagramSocket socket;
     InetAddress address;
     byte[] message;
-
     public UdpClientThread(byte[] message,String addr, int port) {
         super();
         dstAddress = addr;
@@ -27,7 +25,6 @@ public class UdpClientThread extends Thread{
     }
     @Override
     public void run() {
-
         try {
             socket = new DatagramSocket();
             address = InetAddress.getByName(dstAddress);

@@ -31,12 +31,16 @@ public class UdpServerThread extends Thread{
     }
     @Override
     public void run() {
-
+        try {
+            socket = new DatagramSocket(serverPort);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         running = true;
         while(true){
         try {
 
-            socket = new DatagramSocket(serverPort);
+
             Log.e(TAG, "UDP Server is running");
 
             while(running){
@@ -48,11 +52,7 @@ public class UdpServerThread extends Thread{
                 String[] ob=new String[10];
                 ob[0]=   new String(packet.getData());
                 Log.e(TAG,"Packet Received:"+ob[0]);
-                ob[1]=address.toString();
-                Message m=new Message();
-                m.what=1;
-                m.obj=ob;
-                handler.sendMessage(Message.obtain(handler,1,ob));
+                handler.sendMessage(Message.obtain(handler,1,packet));
             }
             Log.e(TAG, "UDP Server ended");
         } catch (SocketException e) {
