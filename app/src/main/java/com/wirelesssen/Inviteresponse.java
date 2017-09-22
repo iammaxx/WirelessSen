@@ -26,10 +26,12 @@ public class Inviteresponse  extends Thread{
     DatagramSocket socket;
     GroupCreation.myhandler handler;
     boolean running;
-    public Inviteresponse(int serverPort, GroupCreation.myhandler handler) {
+    int type;
+    public Inviteresponse(int serverPort, GroupCreation.myhandler handler,int type) {
         super();
         this.serverPort = serverPort;
         this.handler=handler;
+        this.type=type;
     }
     @Override
     public void run() {
@@ -52,7 +54,7 @@ public class Inviteresponse  extends Thread{
                     String[] ob=new String[10];
                     ob[0]=   new String(packet.getData());
                     Log.e(TAG,"Packet Received:"+ob[0]);
-                    handler.sendMessage(Message.obtain(handler,1,packet));
+                    handler.sendMessage(Message.obtain(handler,type,packet));
                 }
                 Log.e(TAG, "UDP Server ended");
             } catch (SocketException e) {

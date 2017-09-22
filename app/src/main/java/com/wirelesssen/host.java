@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -232,14 +233,28 @@ private void deliver(final String Message,  String addr)
             String invite=new String(packet.getData());
             String dname;
             String address=packet.getAddress().toString();
-            String[] x=invite.split("_");
-            if(x[0].equals("JOIN-GROUP")){
-                dname=x[1];
-                //Toast.makeText(parent, "Invite from "+dname+"\nIP:"+address, Toast.LENGTH_SHORT).show();
-                parent.deliver( dname,address);
-            }
-        }
-    }
 
+                  String[] x=invite.split("_");
+                if(x[0].equals("JOIN-GROUP")) {
+                    dname = x[1];
+                    //Toast.makeText(parent, "Invite from "+dname+"\nIP:"+address, Toast.LENGTH_SHORT).show();
+                    parent.deliver(dname, address);
+
+                }
+
+
+    }}
+void start(View view){
+    UdpClientThread send;
+    String[] ips=macip.keySet().toArray(new String[macip.size()]);
+    for(int i=0;i<macip.size();i++)
+    {
+        send=new UdpClientThread("_START_".getBytes(),ips[i],4445);
+        send.start();
+    }
+    Intent in = new Intent(this,GroupSelect.class);
+    startActivity(in);
+
+}
 }
 

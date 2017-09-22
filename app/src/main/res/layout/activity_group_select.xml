@@ -7,17 +7,10 @@
     tools:context="com.wirelesssen.GroupSelect"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/editText2"
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Group Title"
-        android:textAlignment="center" />
-
-    <Button
-        android:id="@+id/submit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="invite"
-        android:text="Invite Nodes" />
+        android:text="Localise"
+        android:textSize="24sp" />
 </LinearLayout>

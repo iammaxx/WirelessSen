@@ -126,7 +126,7 @@ public class GroupCreation extends AppCompatActivity {
         };
         t.start();
         myhandler handler = new myhandler(this);
-        Inviteresponse i = new Inviteresponse(4445,handler);
+        Inviteresponse i = new Inviteresponse(4445,handler,1);
         i.start();
     }
     public static boolean isConnected(Context context) {
@@ -173,7 +173,6 @@ public class GroupCreation extends AppCompatActivity {
         public myhandler(GroupCreation parent) {
             super();
             this.parent=parent;
-
         }
 
         @Override
@@ -182,14 +181,19 @@ public class GroupCreation extends AppCompatActivity {
             String invite=new String(packet.getData());
             String address=packet.getAddress().toString();
             String x[]=invite.split("_");
+            switch (msg.what){
+                case 1 :
             if(x[1].equals("ACCEPT"))
                 Toast.makeText(parent, "Invitation Accepted !", Toast.LENGTH_SHORT).show();
                 else if(x[1].equals("REJECT"))
                 Toast.makeText(parent, "Invitation Rejected !", Toast.LENGTH_SHORT).show();
-                else
-                Toast.makeText(parent, "Unknown Response", Toast.LENGTH_SHORT).show();
-        }
-    }
+                else  if(x[1].equals("START"))
+                    {
+                        Intent in = new Intent(parent,GroupSelect.class);
+                        parent.startActivity(in);
+                    }
+            }
+    }}
 
 
 }
