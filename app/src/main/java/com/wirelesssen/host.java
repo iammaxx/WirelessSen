@@ -254,6 +254,7 @@ void start(View view){
     }
     Intent in = new Intent(this,GroupSelect.class);
     startActivity(in);
+    Toast.makeText(this, "Localise", Toast.LENGTH_SHORT).show();
 
 }
 }
