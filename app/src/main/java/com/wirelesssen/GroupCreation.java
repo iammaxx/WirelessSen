@@ -114,6 +114,7 @@ public class GroupCreation extends AppCompatActivity {
                         //Wait to connect
                         Thread.sleep(1000);
                     }
+                    Thread.sleep(1000);
                     p.dismiss();
                     dname = (TextView) findViewById(R.id.dname);
                     String invite = "JOIN-GROUP_" + dname.getText().toString() + "_";
@@ -190,6 +191,7 @@ public class GroupCreation extends AppCompatActivity {
                 else  if(x[1].equals("START"))
                     {
                         Intent in = new Intent(parent,GroupSelect.class);
+                        in.putExtra("SEN",false);
                         parent.startActivity(in);
                     }
             }

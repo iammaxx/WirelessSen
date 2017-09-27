@@ -61,7 +61,6 @@ public class host extends AppCompatActivity {
         listDataChild = new HashMap<String, List<String>>();
         macip=new HashMap<String, String>();
         expListView=(ExpandableListView)findViewById(R.id.el1);
-
         listNote = new ArrayList<>();
         dev=new HashMap<String, String>();
         textResult=(TextView)findViewById(R.id.res);
@@ -253,6 +252,10 @@ void start(View view){
         send.start();
     }
     Intent in = new Intent(this,GroupSelect.class);
+    in.putExtra("SEN",true);
+    Bundle b = new Bundle();
+    b.putSerializable("macip",macip);
+    in.putExtras(b);
     startActivity(in);
     Toast.makeText(this, "Localise", Toast.LENGTH_SHORT).show();
 
