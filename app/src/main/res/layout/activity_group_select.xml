@@ -6,31 +6,38 @@
     android:layout_height="match_parent"
     tools:context="com.wirelesssen.GroupSelect"
     android:orientation="vertical">
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="130dp"
+        app:srcCompat="@drawable/csels"
+        android:layout_weight="0.14" />
+
     <TextView
         android:id="@+id/tx1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="90dp"
         android:text="Rotation"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_below="@+id/status"
+        android:layout_alignStart="@+id/status"
+        android:layout_marginTop="39dp" />
 
     <TextView
         android:id="@+id/txt1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tx1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="53dp"
         android:text="Steps"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_below="@+id/tx1"
+        android:layout_alignStart="@+id/tx1"
+        android:layout_marginTop="26dp" />
 
     <Button
         android:id="@+id/start"
@@ -38,38 +45,38 @@
         android:layout_height="wrap_content"
         android:onClick="start"
         android:text="Start"
+        android:layout_alignBaseline="@+id/reset"
         android:layout_alignBottom="@+id/reset"
-        android:layout_toStartOf="@+id/status"
-        android:layout_marginBottom="8dp" />
+        android:layout_toStartOf="@+id/reset" />
 
     <Button
         android:id="@+id/stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stop"
-        android:layout_alignBaseline="@+id/start"
-        android:layout_alignBottom="@+id/start"
         android:onClick="stop"
-        android:layout_toEndOf="@+id/reset" />
+        android:layout_alignBaseline="@+id/reset"
+        android:layout_alignBottom="@+id/reset"
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:id="@+id/reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="22dp"
         android:onClick="reset"
-        android:text="reset" />
+        android:text="reset"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/stop" />
 
     <TextView
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
         android:text="Press Start to record"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/imageView"
+        android:layout_toEndOf="@+id/step"
+        android:layout_marginTop="40dp" />
 
     <Button
         android:id="@+id/step"
@@ -77,19 +84,19 @@
         android:layout_height="wrap_content"
         android:text="step"
         android:onClick="add"
-        android:layout_above="@+id/stop"
-        android:layout_toEndOf="@+id/status"
-        android:layout_marginBottom="37dp" />
+        android:layout_alignBaseline="@+id/start"
+        android:layout_alignBottom="@+id/start"
+        android:layout_toStartOf="@+id/start" />
 
     <TextView
         android:id="@+id/mypath"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="mypath"
         android:layout_above="@+id/step"
-        android:layout_alignStart="@+id/start"
-        android:layout_marginBottom="39dp"
-        android:layout_marginStart="9dp"
-        android:text="mypath" />
+        android:layout_toStartOf="@+id/start"
+        android:layout_marginEnd="11dp" />
 
     <TextView
         android:id="@+id/path"

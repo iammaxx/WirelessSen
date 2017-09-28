@@ -9,8 +9,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"></uses-permission>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"></uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <uses-feature android:name="android.hardware.wifi" />
 
@@ -30,7 +30,8 @@
         </activity>
         <activity android:name=".GroupCreation" />
         <activity android:name=".GroupSelect" />
-        <activity android:name=".host"></activity>
+        <activity android:name=".host" />
+        <activity android:name=".canvasplot"></activity>
     </application>
 
 </manifest>
