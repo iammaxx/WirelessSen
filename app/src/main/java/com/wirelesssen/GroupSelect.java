@@ -291,7 +291,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         txt1.setText("Steps"+numSteps);
         File dir = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/IMU");
         dir.mkdirs();
-        File file = new File(dir, "IMUDATA1.txt");
+        File file = new File(dir, "IMUDATA.txt");
         x+=0.69*Math.cos(Math.toRadians(deg));
         y-=0.69*Math.sin(Math.toRadians(deg));
 
