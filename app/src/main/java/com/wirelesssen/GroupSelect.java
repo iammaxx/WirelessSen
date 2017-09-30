@@ -293,7 +293,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         dir.mkdirs();
         File file = new File(dir, "IMUDATA.txt");
         x+=0.69*Math.cos(Math.toRadians(deg));
-        y+=0.69*Math.sin(Math.toRadians(deg));
+        y-=0.69*Math.sin(Math.toRadians(deg));
 
         mypath.setText(Math.round(x)+"  "+Math.round(y));
         FileOutputStream fileOutputStream = new FileOutputStream(file, true);
