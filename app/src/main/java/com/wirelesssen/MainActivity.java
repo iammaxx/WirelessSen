@@ -115,8 +115,9 @@ public class MainActivity extends AppCompatActivity {
             wifiList = wMan.getScanResults();
             sb.append("\n        Number Of Wifi connections :"+wifiList.size()+"\n\n");
             //List<List<String>> tot = new ArrayList<List<String>>();
-            Toast.makeText(context, "Scanned", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Scanned"+wifiList.size(), Toast.LENGTH_SHORT).show();
             Log.d("TAG","Scanned");
+
             for(int i = 0; i < wifiList.size(); i++){
                 List<String> info=new ArrayList<String>();
                 listDataHeader.add((i+1)+"."+wifiList.get(i).SSID);

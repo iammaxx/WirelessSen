@@ -31,7 +31,6 @@
         <activity android:name=".GroupCreation" />
         <activity android:name=".GroupSelect" />
         <activity android:name=".host" />
-        <activity android:name=".canvasplot"></activity>
     </application>
 
 </manifest>

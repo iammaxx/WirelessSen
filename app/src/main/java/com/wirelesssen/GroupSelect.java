@@ -1,11 +1,6 @@
 package com.wirelesssen;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,58 +8,80 @@ import android.hardware.SensorManager;
 import android.net.wifi.ScanResult;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.util.HashMap;
 import java.util.List;
-
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 public class GroupSelect extends AppCompatActivity implements SensorEventListener,StepListener{
-    static int cnt=4;
-    Bitmap mutableBitmap;
-    Paint paint = new Paint();
- //   float x,y;
-    long theta;
-    float ix,iy,fx,fy;
-    Canvas canvas;
-    ImageView imageView;
     SensorManager mSensorManager;
     SimpleStepDetector simpleStepDetector;
     int numSteps;
     TextView tx,txt1,st;
     boolean type;
-    double x,y;
     private TextView mypath;
     private TextView path;
-    HashMap<String, String> macip;
+    static HashMap<String, String> macip;
+    HashMap<String, String> hostip;
+    HashMap<String, String> iphost;
+
+    Bitmap mutableBitmap;
+    Bitmap workingBitmap;
+    Paint paint = new Paint();
+    float x,y;
+    float a,b;
+    long theta;
+    TextView textView;
+    static int cnt=4;
+    float ix,iy,fx,fy;
+    Canvas canvas;
+    TextView textView2;
+    ImageView imageView;
+    Button bx;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_select);
-            macip = (HashMap<String, String>) getIntent().getExtras().getSerializable("macip");
-            if (macip==null)
-                Toast.makeText(this, "MACIP NULL", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(this,macip.keySet().iterator().next(), Toast.LENGTH_SHORT).show();
-
+        macip = (HashMap<String, String>) getIntent().getExtras().getSerializable("macip");
+        hostip=(HashMap<String, String>) getIntent().getExtras().getSerializable("hostip");
+        iphost =(HashMap<String, String>) getIntent().getExtras().getSerializable("iphost");
         x=0;
         y=0;
+        bx=(Button)findViewById(R.id.start);
         tx=(TextView)findViewById(R.id.tx1);
         txt1=(TextView)findViewById(R.id.txt1);
         st=(TextView)findViewById(R.id.status);
@@ -77,6 +94,66 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         ts = System.currentTimeMillis();
         gy=0.0;
         gy1=0.0;
+
+
+        imageView = (ImageView)findViewById(R.id.imageView);
+        BitmapFactory.Options myOptions = new BitmapFactory.Options();
+        myOptions.inDither = true;
+        myOptions.inScaled = false;
+        myOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        myOptions.inPurgeable = true;
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.map,myOptions);
+        paint.setAntiAlias(true);
+        paint.setColor(Color.BLUE);
+        workingBitmap = Bitmap.createBitmap(bitmap);
+        mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        imageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                canvas = new Canvas(mutableBitmap);
+
+                if(cnt==4) {
+                    // Toast.makeText(getApplicationContext(),"if",Toast.LENGTH_SHORT).show();
+                    ix = event.getX();
+                    iy = event.getY();
+                    x=ix/10;
+                    y=iy/10;
+                    canvas.drawCircle(ix, iy, 25, paint);
+                    cnt--;
+                }
+                else if(cnt==3)
+                {
+                    cnt--;
+                }
+                else if (cnt==2) {
+                    //  Toast.makeText(getApplicationContext(),"else",Toast.LENGTH_SHORT).show();
+                    fx = event.getX();
+                    fy = event.getY();
+                    canvas.drawCircle(fx, fy, 25, paint);
+                    cnt--;
+
+                    theta=Math.round(Math.toDegrees(Math.atan((iy-fy)/(fx-ix))));
+                    if(fx>ix&&fy>iy)
+                        theta+=360;
+                    else if(fy>iy &&fx<ix)
+                        theta+=180;
+                    else if(fx<ix && fy<iy)
+                        theta=180+theta;
+                    bx.setEnabled(true);
+                    deg-=theta;
+                    imageView.setOnTouchListener(null);
+                }
+                imageView.setAdjustViewBounds(true);
+                imageView.setImageBitmap(mutableBitmap);
+
+                // mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                //Toast.makeText(MainActivity.this, String.valueOf(cnt), Toast.LENGTH_SHORT).show();
+
+                return true;
+            }
+        });
+
     }
     getrssi receive;
     Thread t;
@@ -217,6 +294,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         File file = new File(dir, "IMUDATA.txt");
         x+=0.69*Math.cos(Math.toRadians(deg));
         y+=0.69*Math.sin(Math.toRadians(deg));
+
         mypath.setText(Math.round(x)+"  "+Math.round(y));
         FileOutputStream fileOutputStream = new FileOutputStream(file, true);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
@@ -224,7 +302,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         outputStreamWriter.close();
         fileOutputStream.close();
     }
-    public class myhandler extends Handler {
+    public static class myhandler extends Handler {
         private GroupSelect parent;
 
         public myhandler(GroupSelect parent) {
@@ -234,73 +312,43 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
 
         @Override
         public void handleMessage(Message msg) {
-            DatagramPacket packet= (DatagramPacket) msg.obj;
+            DatagramPacket packet = (DatagramPacket) msg.obj;
+        //    switch(msg.what){
+         //       case 0 :
             String invite=new String(packet.getData());
             String address=packet.getAddress().toString();
             String x[]=invite.split("_");
-
            parent.path.setText(Long.toString(Math.round(Double.parseDouble(x[0])))+"    "+Long.toString(Math.round(Double.parseDouble(x[1]))));
-            plotter( Math.round(Double.parseDouble(x[0])), Math.round(Double.parseDouble(x[1])));
-            }
-
-
-        }
-    public void plotter(long x1,long x2) {
-
-        imageView = (ImageView) findViewById(R.id.imageView);
-        BitmapFactory.Options myOptions = new BitmapFactory.Options();
-        myOptions.inDither = true;
-        myOptions.inScaled = false;
-        myOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        myOptions.inPurgeable = true;
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.csels, myOptions);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.BLUE);
-        final Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
-        mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
-        // imageView.setOnTouchListener(new View.OnTouchListener() {
-        //   @Override
-        //   public boolean onTouch(View v, MotionEvent event) {
-        canvas = new Canvas(mutableBitmap);
-        //  textView = (TextView) findViewById(R.id.textView);
-        //textView.setText("X:" + event.getX() + "\nY:" + event.getY());
-        //   if(cnt==4) {
-        // Toast.makeText(getApplicationContext(),"if",Toast.LENGTH_SHORT).show();
-        //         ix = event.getX();
-        //       iy = event.getY();
-        canvas.drawCircle(x1*10, x2*10, 25, paint);
-        //      cnt--;
-        //    }
-        //   else if(cnt==3)
-        //     {
-        //cnt--;
-        //       }
-        //         else if (cnt==2) {
-        //  Toast.makeText(getApplicationContext(),"else",Toast.LENGTH_SHORT).show();
-        //   fx = event.getX();
-        //     fy = event.getY();
-        //    canvas.drawCircle(fx, fy, 25, paint);
-        //  cnt--;
-        //textView2=(TextView)findViewById(R.id.textView2);
-        //theta = Math.round(Math.toDegrees(Math.atan((iy - fy) / (fx - ix))));
-        //if (fx > ix && fy > iy)
-        //    theta += 360;
-        //else if (fy > iy && fx < ix)
-         //   theta += 180;
-        //else if (fx < ix && fy < iy)
-         //   theta = 180 + theta;
-        //  textView2.setText("theta="+theta);
-
-        imageView.setAdjustViewBounds(true);
-        imageView.setImageBitmap(mutableBitmap);
-
-        // mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
-        //Toast.makeText(MainActivity.this, String.valueOf(cnt), Toast.LENGTH_SHORT).show();
-    }
-
-            }
+            parent.canvas = new Canvas(parent.mutableBitmap);
+            parent.a=Float.parseFloat(x[0]);
+            parent.b=Float.parseFloat(x[1]);
+            parent.canvas.drawCircle(parent.a*10,parent.b*10,25,parent.paint);
+            parent.imageView.setAdjustViewBounds(true);
+            parent.imageView.setImageBitmap(parent.mutableBitmap);
+            parent.mutableBitmap = parent.workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
 
 
 
+            /*break;
+                case 1 :
+
+                    try {
+                        packet = (DatagramPacket) msg.obj;
+                        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+                        ObjectOutputStream out = new ObjectOutputStream(byteOut);
+                        out.writeObject(macip);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    ByteArrayInputStream bytein=new ByteArrayInputStream(packet.getData());
+                    try {
+                        ObjectInputStream in = new ObjectInputStream(bytein);
+                        HashMap<String,String> data2 = (HashMap<String,String>) in.readObject();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+            }*/
+        }}}
 
