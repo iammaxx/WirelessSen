@@ -31,7 +31,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -57,10 +60,10 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
     static HashMap<String, String> macip;
     HashMap<String, String> hostip;
     HashMap<String, String> iphost;
-
+    String distances[][];
     Bitmap mutableBitmap;
     Bitmap workingBitmap;
-    Paint paint = new Paint();
+    Paint[] paint = new Paint[4];
     float x,y;
     float a,b;
     long theta;
@@ -71,7 +74,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
     TextView textView2;
     ImageView imageView;
     Button bx;
-
+    HashMap<String,String[]>ipdist;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +82,12 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         macip = (HashMap<String, String>) getIntent().getExtras().getSerializable("macip");
         hostip=(HashMap<String, String>) getIntent().getExtras().getSerializable("hostip");
         iphost =(HashMap<String, String>) getIntent().getExtras().getSerializable("iphost");
+        ipdist=new HashMap<String, String[]>();
         x=0;
         y=0;
+        for (int i=0;i<4;i++){
+            paint[i] = new Paint();
+        }
         bx=(Button)findViewById(R.id.start);
         tx=(TextView)findViewById(R.id.tx1);
         txt1=(TextView)findViewById(R.id.txt1);
@@ -103,8 +110,14 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         myOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
         myOptions.inPurgeable = true;
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.map,myOptions);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.BLUE);
+        paint[0].setAntiAlias(true);
+        paint[0].setColor(Color.BLUE);
+        paint[1].setAntiAlias(true);
+        paint[1].setColor(Color.RED);
+        paint[2].setAntiAlias(true);
+        paint[2].setColor(Color.YELLOW);
+        paint[3].setAntiAlias(true);
+        paint[3].setColor(Color.BLACK);
         workingBitmap = Bitmap.createBitmap(bitmap);
         mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
@@ -119,7 +132,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
                     iy = event.getY();
                     x=ix/10;
                     y=iy/10;
-                    canvas.drawCircle(ix, iy, 25, paint);
+                    canvas.drawCircle(ix, iy, 25, paint[0]);
                     cnt--;
                 }
                 else if(cnt==3)
@@ -130,7 +143,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
                     //  Toast.makeText(getApplicationContext(),"else",Toast.LENGTH_SHORT).show();
                     fx = event.getX();
                     fy = event.getY();
-                    canvas.drawCircle(fx, fy, 25, paint);
+                    canvas.drawCircle(fx, fy, 25, paint[0]);
                     cnt--;
 
                     theta=Math.round(Math.toDegrees(Math.atan((iy-fy)/(fx-ix))));
@@ -173,8 +186,9 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
                             public void run() {
                                 try {
                                     while(true){
-                                        for(int i=0;i<macip.values().size();i++) {
-                                            UdpClientThread send = new UdpClientThread((String.valueOf(x) + "_" + String.valueOf(y)).getBytes(),macip.keySet().iterator().next(), 4455);
+                                        Iterator<String> it= macip.keySet().iterator();
+                                        while(it.hasNext()) {
+                                            UdpClientThread send = new UdpClientThread((String.valueOf(x) + "_" + String.valueOf(y)).getBytes(),it.next(), 4455);
                                             send.start();
                                         }
                                         Thread.sleep(2000);
@@ -291,7 +305,8 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         txt1.setText("Steps"+numSteps);
         File dir = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/IMU");
         dir.mkdirs();
-        File file = new File(dir, "IMUDATA.txt");
+        File file = new File(dir, "IMUDATA" +
+                ".txt");
         x+=0.69*Math.cos(Math.toRadians(deg));
         y-=0.69*Math.sin(Math.toRadians(deg));
 
@@ -316,16 +331,27 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         //    switch(msg.what){
          //       case 0 :
             String invite=new String(packet.getData());
-            String address=packet.getAddress().toString();
+            //String address=packet.getAddress().toString();
             String x[]=invite.split("_");
-           parent.path.setText(Long.toString(Math.round(Double.parseDouble(x[0])))+"    "+Long.toString(Math.round(Double.parseDouble(x[1]))));
-            parent.canvas = new Canvas(parent.mutableBitmap);
-            parent.a=Float.parseFloat(x[0]);
-            parent.b=Float.parseFloat(x[1]);
-            parent.canvas.drawCircle(parent.a*10,parent.b*10,25,parent.paint);
-            parent.imageView.setAdjustViewBounds(true);
-            parent.imageView.setImageBitmap(parent.mutableBitmap);
-            parent.mutableBitmap = parent.workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
+            parent.path.setText(Long.toString(Math.round(Double.parseDouble(x[0])))+"    "+Long.toString(Math.round(Double.parseDouble(x[1]))));
+            parent.ipdist.put(packet.getAddress().toString(),x);
+            Collection<String[]> arr =parent.ipdist.values();
+            Iterator<String []> ite = arr.iterator();
+            //String dis[] = Arrays.copyOf(obj,obj.length,String[].class);
+            int n =arr.size();
+            int i=0;
+            while(ite.hasNext()) {
+                i++;
+                parent.canvas = new Canvas(parent.mutableBitmap);
+                String[] y = ite.next();
+                parent.a = Float.parseFloat(y[0]);
+                parent.b = Float.parseFloat(y[1]);
+                parent.canvas.drawCircle(parent.a * 10, parent.b * 10, 15, parent.paint[i]);
+            }
+            parent.canvas.drawCircle(parent.x*10,parent.y*10,15,parent.paint[3]);
+                parent.imageView.setAdjustViewBounds(true);
+                parent.imageView.setImageBitmap(parent.mutableBitmap);
+                parent.mutableBitmap = parent.workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
 
 
