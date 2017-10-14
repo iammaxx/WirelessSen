@@ -111,4 +111,13 @@
         android:layout_above="@+id/status"
         android:layout_marginBottom="141dp"
         android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/deg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/mypath"
+        android:layout_marginStart="22dp"
+        android:layout_toEndOf="@+id/txt1"
+        android:text="TextView" />
 </RelativeLayout>

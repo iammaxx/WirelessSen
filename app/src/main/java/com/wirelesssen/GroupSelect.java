@@ -66,7 +66,8 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
     Paint[] paint = new Paint[4];
     float x,y;
     float a,b;
-    long theta;
+    double theta;
+    TextView degree;
     TextView textView;
     static int cnt=4;
     float ix,iy,fx,fy;
@@ -75,6 +76,9 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
     ImageView imageView;
     Button bx;
     HashMap<String,String[]>ipdist;
+    private Double temp=0.0;
+    private double chng;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +96,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         tx=(TextView)findViewById(R.id.tx1);
         txt1=(TextView)findViewById(R.id.txt1);
         st=(TextView)findViewById(R.id.status);
+        degree = (TextView) findViewById(R.id.deg);
         type=getIntent().getBooleanExtra("SEN",false);
         numSteps=0;
         simpleStepDetector=new SimpleStepDetector();
@@ -130,6 +135,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
                     // Toast.makeText(getApplicationContext(),"if",Toast.LENGTH_SHORT).show();
                     ix = event.getX();
                     iy = event.getY();
+                    Toast.makeText(GroupSelect.this, "x value"+ix+"y value"+iy, Toast.LENGTH_SHORT).show();
                     x=ix/10;
                     y=iy/10;
                     canvas.drawCircle(ix, iy, 25, paint[0]);
@@ -143,18 +149,19 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
                     //  Toast.makeText(getApplicationContext(),"else",Toast.LENGTH_SHORT).show();
                     fx = event.getX();
                     fy = event.getY();
+                    Toast.makeText(GroupSelect.this, "x value"+fx+"y value"+fy, Toast.LENGTH_SHORT).show();
                     canvas.drawCircle(fx, fy, 25, paint[0]);
                     cnt--;
 
-                    theta=Math.round(Math.toDegrees(Math.atan((iy-fy)/(fx-ix))));
-                    if(fx>ix&&fy>iy)
-                        theta+=360;
-                    else if(fy>iy &&fx<ix)
-                        theta+=180;
-                    else if(fx<ix && fy<iy)
-                        theta=180+theta;
+                    theta=Math.round(Math.toDegrees(Math.atan((fy-iy)/(fx-ix))));
+                    //if(fx>ix&&fy>iy)
+                      //  theta+=360;
+                    //else if(fy>iy &&fx<ix)
+                        //theta+=180;
+                    //else if(fx<ix && fy<iy)
+                        //theta=180+theta;
                     bx.setEnabled(true);
-                    deg-=theta;
+                    //deg+=theta;
                     imageView.setOnTouchListener(null);
                 }
                 imageView.setAdjustViewBounds(true);
@@ -251,7 +258,6 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         File dir = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/IMU");
         dir.mkdirs();
         File file = new File(dir, "IMUDATA.txt");
-
         FileOutputStream fileOutputStream = new FileOutputStream(file, true);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
         outputStreamWriter.write(0.69+" " + deg+"\n");
@@ -289,6 +295,7 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
             deg += 360;
         gy = vel;
         //Toast.makeText(this, "Sensing"+Double.toString(vel), Toast.LENGTH_SHORT).show();
+        //deg = deg+theta;
         tx.setText("Rotation: " + Math.round(deg) + " degrees");
 
 
@@ -307,10 +314,18 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         dir.mkdirs();
         File file = new File(dir, "IMUDATA" +
                 ".txt");
-        x+=0.69*Math.cos(Math.toRadians(deg));
-        y-=0.69*Math.sin(Math.toRadians(deg));
+        chng=deg-temp;
+        temp=deg;
+        theta = theta+chng;
+        if(theta>360)
+            theta=theta%360;
+        else if(theta<-360)
+            theta+=360;
+        x+=0.69*Math.cos(Math.toRadians(theta));
+        y+=0.69*Math.sin(Math.toRadians(theta));
 
         mypath.setText(Math.round(x)+"  "+Math.round(y));
+        degree.setText(""+theta);
         FileOutputStream fileOutputStream = new FileOutputStream(file, true);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
         outputStreamWriter.write(0.69+" " + deg+"\n");
