@@ -154,12 +154,12 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
                     cnt--;
 
                     theta=Math.round(Math.toDegrees(Math.atan((fy-iy)/(fx-ix))));
-                    //if(fx>ix&&fy>iy)
-                      //  theta+=360;
-                    //else if(fy>iy &&fx<ix)
-                        //theta+=180;
-                    //else if(fx<ix && fy<iy)
-                        //theta=180+theta;
+                    if(fx>ix&&fy>iy)
+                        theta+=360;
+                    else if(fy>iy &&fx<ix)
+                        theta+=180;
+                    else if(fx<ix && fy<iy)
+                        theta=180+theta;
                     bx.setEnabled(true);
                     //deg+=theta;
                     imageView.setOnTouchListener(null);
@@ -297,7 +297,27 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         //Toast.makeText(this, "Sensing"+Double.toString(vel), Toast.LENGTH_SHORT).show();
         //deg = deg+theta;
         tx.setText("Rotation: " + Math.round(deg) + " degrees");
+        chng=deg-temp;
+        temp=deg;
+        if(fy>iy+10) {
+            theta = (theta - chng);
+        }
+        else if(fy+10<iy){
+            theta=(theta-chng);
+        }
 
+        else if(fx>ix){
+            theta=theta-chng;
+        }
+        else if(fx<ix){
+            theta=theta+chng;
+        }
+        if(theta>360)
+            theta=theta%360;
+        else if(theta<-360)
+            theta+=360;
+
+        degree.setText(""+theta);
 
     }
 
@@ -312,20 +332,11 @@ public class GroupSelect extends AppCompatActivity implements SensorEventListene
         txt1.setText("Steps"+numSteps);
         File dir = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/IMU");
         dir.mkdirs();
-        File file = new File(dir, "IMUDATA" +
-                ".txt");
-        chng=deg-temp;
-        temp=deg;
-        theta = theta+chng;
-        if(theta>360)
-            theta=theta%360;
-        else if(theta<-360)
-            theta+=360;
+        File file = new File(dir, "IMUDATA" +".txt");
         x+=0.69*Math.cos(Math.toRadians(theta));
         y+=0.69*Math.sin(Math.toRadians(theta));
-
         mypath.setText(Math.round(x)+"  "+Math.round(y));
-        degree.setText(""+theta);
+
         FileOutputStream fileOutputStream = new FileOutputStream(file, true);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
         outputStreamWriter.write(0.69+" " + deg+"\n");

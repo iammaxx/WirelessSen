@@ -30,8 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-
     WifiManager wMan;
     List<ScanResult> wifiList;
     TextView tv;

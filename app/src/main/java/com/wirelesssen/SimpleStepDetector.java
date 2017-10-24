@@ -9,8 +9,7 @@ public class SimpleStepDetector {
     private static final int ACCEL_RING_SIZE = 50;
     private static final int VEL_RING_SIZE = 10;
     private static final float STEP_THRESHOLD = 5f;
-    private static final int STEP_DELAY_NS = 250000000;
-
+    private static final int STEP_DELAY_NS = 225000000;
     private int accelRingCounter = 0;
     private float[] accelRingX = new float[ACCEL_RING_SIZE];
     private float[] accelRingY = new float[ACCEL_RING_SIZE];
